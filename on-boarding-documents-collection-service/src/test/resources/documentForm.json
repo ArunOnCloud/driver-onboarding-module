@@ -1,0 +1,20 @@
+{
+  "documents": [
+    {
+      "fileType":"Adhar",
+      "fileUrl": "string"
+    },
+    {
+      "fileType":"pan",
+      "fileUrl": "string"
+    },
+    {
+      "fileType":"DL",
+      "fileUrl": "string"
+    }
+  ],
+  "driverId": "first-id-1",
+  "onboardingStatus": "gold",
+  "versionNumer":1000,
+  "number": 123
+}
