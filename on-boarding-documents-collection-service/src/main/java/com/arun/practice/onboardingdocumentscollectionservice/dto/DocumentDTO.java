@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class DocumentDTO {
+    private String docId;
     private String fileType;
     private String fileUrl;
 }

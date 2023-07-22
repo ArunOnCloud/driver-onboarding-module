@@ -5,6 +5,7 @@ public enum DocumentCollectionServiceException {
     DOCUMENT_SAVE_EXCEPTION("Document not save",1081),
     JSON_CONVERSION_EXCEPTION("Json conversion exception ",1082),
     DRIVER_NOT_PRESENT_EXCEPTION("Driver not present",1083);
+    //REQUEST_VALIDATION_EXCEPTION("")
     private final String message;
     private final Integer errorCode;
 

@@ -8,3 +8,6 @@ configuring metrics
 metrics path prometheous: http://localhost:8081/actuator/prometheus
 
 actuator metrics path: http://localhost:8081/actuator
+
+
+grafana url : http://localhost:3000/

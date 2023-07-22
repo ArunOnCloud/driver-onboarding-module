@@ -14,4 +14,10 @@ public class ServiceException extends RuntimeException{
         this.errorCode = documentCollectionServiceException.getErrorCode();
         this.exception = exception;
     }
+
+    public ServiceException(){
+    }
+    public String toString(){
+        return "message="+message + ",errorCode="+errorCode;
+    }
 }
