@@ -23,7 +23,6 @@ public class DocumentCollectionController {
 
     @PostMapping("")
     public ResponseEntity<String> createDriverOnboaring(@RequestBody DocumentCollectionDTO documentCollectionDTO){
-
         documentCollectionService.createDriverOnboaring(documentCollectionDTO);
         return new ResponseEntity<String>("Success", HttpStatus.CREATED);
     }

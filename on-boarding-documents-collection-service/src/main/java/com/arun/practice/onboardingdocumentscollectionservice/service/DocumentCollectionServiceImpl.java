@@ -1,6 +1,8 @@
 package com.arun.practice.onboardingdocumentscollectionservice.service;
 
 import com.arun.practice.onboardingdocumentscollectionservice.dto.DocumentCollectionDTO;
+import com.arun.practice.onboardingdocumentscollectionservice.exception.DocumentCollectionServiceException;
+import com.arun.practice.onboardingdocumentscollectionservice.exception.ServiceException;
 import com.arun.practice.onboardingdocumentscollectionservice.model.DocumentCollection;
 import com.arun.practice.onboardingdocumentscollectionservice.repo.DocumentCollectionRepo;
 import com.arun.practice.onboardingdocumentscollectionservice.util.Utils;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -20,24 +23,36 @@ public class DocumentCollectionServiceImpl {
 
     public boolean createDriverOnboaring(DocumentCollectionDTO documentCollectionDTO){
         log.info("document received: {}"+ documentCollectionDTO);
-
-        DocumentCollection documentCollection = Utils.dtoToModel(documentCollectionDTO);
-        documentCollection.setId(Utils.getUUID());
-        DocumentCollection saved = documentCollectionRepo.save(documentCollection);
-        log.info("Saved dto: {}",documentCollectionDTO);
-
-        return true;
-
+        try {
+            DocumentCollection documentCollection = Utils.dtoToModel(documentCollectionDTO);
+            documentCollection.setId(Utils.getUUID());
+            DocumentCollection saved = documentCollectionRepo.save(documentCollection);
+            return true;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw new ServiceException(DocumentCollectionServiceException.DOCUMENT_SAVE_EXCEPTION,ex);
+        }
     }
     public boolean updateDriverOnboaringDto(DocumentCollectionDTO documentCollectionDTO){
         log.info("document received: {}"+ documentCollectionDTO);
-
+        DocumentCollection documentCollection = Utils.dtoToModel(documentCollectionDTO);
+        documentCollectionRepo.save(documentCollection);
         return true;
     }
     public boolean updateDriverOnboardingStatus(DocumentCollectionDTO documentCollectionDTO){
         log.info(" updating status:{}",documentCollectionDTO.getOnboardingStatus());
-        //get
-        return true;
+        Optional<DocumentCollection> documentCollectionOptional = documentCollectionRepo.findById(documentCollectionDTO.getDriverId());
+        if(documentCollectionOptional.isPresent()){
+            DocumentCollection documentCollection = documentCollectionOptional.get();
+            documentCollection.setOnboardingStatus(documentCollectionDTO.getOnboardingStatus());
+            documentCollectionRepo.save(documentCollection);
+            return true;
+        }else{
+            log.error("Driver with driver id {} Not present",documentCollectionDTO.getDriverId());
+            throw new ServiceException(DocumentCollectionServiceException.DRIVER_NOT_PRESENT_EXCEPTION,new Exception(documentCollectionDTO.getDriverId()+ "not present"));
+
+        }
+
     }
 
     public List<DocumentCollectionDTO> listAll(){

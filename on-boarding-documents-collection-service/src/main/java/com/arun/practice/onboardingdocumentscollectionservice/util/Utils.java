@@ -1,8 +1,13 @@
 package com.arun.practice.onboardingdocumentscollectionservice.util;
 
 import com.arun.practice.onboardingdocumentscollectionservice.dto.DocumentCollectionDTO;
+import com.arun.practice.onboardingdocumentscollectionservice.exception.DocumentCollectionServiceException;
+import com.arun.practice.onboardingdocumentscollectionservice.exception.ServiceException;
 import com.arun.practice.onboardingdocumentscollectionservice.model.DocumentCollection;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,32 +18,37 @@ import java.util.UUID;
 public class Utils {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
 
     public static DocumentCollectionDTO modelTODto(DocumentCollection documentCollection){
         try {
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
             String json = objectMapper.writeValueAsString(documentCollection);
             DocumentCollectionDTO documentCollectionDTO = objectMapper.readValue(json, DocumentCollectionDTO.class);
             return documentCollectionDTO;
-        }catch (Exception e){
-            e.printStackTrace();
-            log.error("Conversion error {}",e.fillInStackTrace());
+        }catch ( JsonProcessingException jsonMappingException ){
+            jsonMappingException.printStackTrace();
+            throw new ServiceException(DocumentCollectionServiceException.JSON_CONVERSION_EXCEPTION,jsonMappingException);
+        } catch (Exception exception){
+            throw new ServiceException(DocumentCollectionServiceException.JSON_CONVERSION_EXCEPTION,exception);
         }
-        return null;
-
     }
     public static DocumentCollection dtoToModel(DocumentCollectionDTO documentCollectionDTO){
         try {
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             String json = objectMapper.writeValueAsString(documentCollectionDTO);
             DocumentCollection documentCollection= objectMapper.readValue(json, DocumentCollection.class);
             return documentCollection;
-        }catch (Exception e){
-            e.printStackTrace();
-            log.error("Conversion error {}",e.fillInStackTrace());
+        }catch ( JsonProcessingException jsonMappingException ){
+            jsonMappingException.printStackTrace();
+            throw new ServiceException(DocumentCollectionServiceException.JSON_CONVERSION_EXCEPTION,jsonMappingException);
+
+        } catch (Exception exception){
+            throw new ServiceException(DocumentCollectionServiceException.JSON_CONVERSION_EXCEPTION,exception);
         }
-        return null;
     }
     public static String getUUID(){
         return UUID.randomUUID().toString();
