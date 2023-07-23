@@ -13,8 +13,8 @@ alerting:
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+# - "first_rules.yml"
+# - "second_rules.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
@@ -34,3 +34,31 @@ scrape_configs:
       - targets: ["localhost:8081"]
         labels:
           application: "documents service"
+  - job_name: "on-boarding-documents-collection-service"
+    metrics_path: "/actuator/prometheus"
+    scrape_interval: 3s
+    static_configs:
+      - targets: ["localhost:8083"]
+        labels:
+          application: "on-boarding-documents-collection-service"
+  - job_name: "on-boarding-background-verification-service"
+    metrics_path: "/actuator/prometheus"
+    scrape_interval: 3s
+    static_configs:
+      - targets: ["localhost:8085"]
+        labels:
+          application: "on-boarding-background-verification-service"
+  - job_name: "on-boarding-device-shipping-service"
+    metrics_path: "/actuator/prometheus"
+    scrape_interval: 3s
+    static_configs:
+      - targets: ["localhost:8084"]
+        labels:
+          application: "on-boarding-device-shipping-service"
+  - job_name: "user-service"
+    metrics_path: "/actuator/prometheus"
+    scrape_interval: 3s
+    static_configs:
+      - targets: ["localhost:8082"]
+        labels:
+          application: "user-service"

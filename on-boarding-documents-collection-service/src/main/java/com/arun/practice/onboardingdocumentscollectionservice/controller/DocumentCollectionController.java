@@ -7,6 +7,10 @@ import com.arun.practice.onboardingdocumentscollectionservice.exception.RequestV
 import com.arun.practice.onboardingdocumentscollectionservice.exception.ServiceException;
 import com.arun.practice.onboardingdocumentscollectionservice.exception.ValidationCode;
 import com.arun.practice.onboardingdocumentscollectionservice.service.DocumentCollectionServiceImpl;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,18 @@ public class DocumentCollectionController {
     @Autowired
     DocumentCollectionServiceImpl documentCollectionService;
 
+    @Autowired
+    CompositeMeterRegistry meterRegistry;
+
+    private Counter apiHitCounter = null;
+    private Counter exceptionCounter = null;
+    @PostConstruct
+    private void initMetrics(){
+        apiHitCounter = meterRegistry.counter("document.collection.controller.api.hit.count","documentCollection","hitCounter");
+        exceptionCounter = meterRegistry.counter("document.collection.controller.exception.count","documentCollection","exceptionCounter");
+
+    }
+
     @PostMapping("")
     public ResponseEntity<String> createDriverOnboaring(@RequestBody DocumentCollectionDTO documentCollectionDTO){
         documentCollectionService.createDriverOnboaring(documentCollectionDTO);
@@ -36,12 +52,15 @@ public class DocumentCollectionController {
     }
 
     @PutMapping("document/update")
+    @Timed
     public ResponseEntity<String> updateDriverDocument(@RequestBody DocumentCollectionDTO documentCollectionDTO){
         try {
+            apiHitCounter.increment();
             validateDocumentUpdateRequest(documentCollectionDTO);
             documentCollectionService.updateDriverDocuments(documentCollectionDTO);
             return new ResponseEntity<String>("Success", HttpStatus.CREATED);
         }catch (RequestValidationException e){
+            //meterRegistry.
             return   new ResponseEntity<String>(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }catch (ServiceException e){
             log.error("Update document failed:{}",e);
@@ -58,6 +77,7 @@ public class DocumentCollectionController {
     public ResponseEntity<String> addDriverDocument(@RequestBody DocumentCollectionDTO documentCollectionDTO){
 
         try {
+            apiHitCounter.increment();
             validateDocumentAddRequest(documentCollectionDTO);
             documentCollectionService.addDriverDocument(documentCollectionDTO);
             return new ResponseEntity<String>("Success", HttpStatus.OK);
@@ -77,6 +97,7 @@ public class DocumentCollectionController {
     @PutMapping("status")
     public ResponseEntity<String> updateDriverOnboaringStatus(@RequestBody DocumentCollectionDTO documentCollectionDTO){
         try{
+            apiHitCounter.increment();
             validateStatusUpdateRequest(documentCollectionDTO);
             documentCollectionService.updateDriverOnboardingStatus(documentCollectionDTO);
             return new ResponseEntity<String>("update success", HttpStatus.OK);
@@ -95,6 +116,7 @@ public class DocumentCollectionController {
 
     @GetMapping
     public ResponseEntity<List<DocumentCollectionDTO>> getAll(){
+        apiHitCounter.increment();
         return new ResponseEntity<>(documentCollectionService.listAll(),HttpStatus.OK);
     }
 
